@@ -1,0 +1,8 @@
+{
+  "git.autocommit.enable": true,
+  "git.autocommit.message": "auto update",
+  "git.autocommit.interval": 300,
+  "git.autocommit.push": true,
+  "github.copilot.chat.model": "Gemini 3 Flash (Preview)",
+  "git.ignoreLimitWarning": true
+}
