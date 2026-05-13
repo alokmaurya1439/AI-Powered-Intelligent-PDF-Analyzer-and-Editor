@@ -99,15 +99,19 @@ pip install -r requirements.txt
    ```
 2. Edit `.env` and add your API keys:
    ```
-   GROQ_API_KEY=your_groq_api_key_here
+   GROQ_API_KEY=your_primary_groq_api_key_here
+   GROQ_API_KEY_2=your_second_groq_api_key_here
    ```
    Get your Groq API key from: https://console.groq.com
 
 ## Configuration
 
 ### Required Environment Variables
-- `GROQ_API_KEY`: Your Groq API key (required for AI features)
+- `GROQ_API_KEY`: Your Groq API key (required for AI features). You can also use `GROQ_API_KEY_1` as an alias.
 - `TESSERACT_PATH`: Path to Tesseract executable (for OCR)
+
+### Optional Environment Variables
+- `GROQ_API_KEY_2`: Optional second Groq API key for failover or additional quota
 
 ### Optional Environment Variables
 - `BACKEND_HOST`: Backend server host (default: 127.0.0.1)
@@ -267,7 +271,11 @@ The application will be available at: `http://localhost:8501`
 ## Troubleshooting
 
 ### Issue: "GROQ_API_KEY not found"
-**Solution**: Ensure `.env` file exists with your GROQ_API_KEY set.
+**Solution**: Ensure `.env` file exists with at least one of these set:
+- `GROQ_API_KEY`
+- `GROQ_API_KEY_2`
+
+If you have a second Groq key, you can use `GROQ_API_KEY_2` as a fallback.
 
 ### Issue: "Tesseract not found"
 **Solution**: 
