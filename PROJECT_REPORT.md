@@ -224,7 +224,26 @@ Smart Form Filling, File Formatting Converters, Translator, Grammar Solvers, Sum
 `blank_detector.py`, `file_converter.py`, `pdf_reader.py`, `pdf_editor.py`, `error_detector.py`, `error_solver.py`, `summarizer.py`, `translate.py`.
 
 ## 4.8 Selection of Technology
-Python was selected universally due to its immense and continuously maintained AI ecosystem, enabling the deployment of AI functionalities and file parsers on the same framework base.
+The technology stack for the **AI Powered Intelligent PDF Analyzer and Editor** was carefully selected to ensure high performance, rapid development, and seamless integration of complex Artificial Intelligence models with robust document processing libraries. The foundational language chosen for this project is **Python**, selected universally due to its immense, continuously maintained AI ecosystem, enabling the deployment of advanced AI functionalities and file parsers on a unified framework.
+
+### 4.8.1 Frontend Technology
+- **Streamlit**: Selected as the primary frontend framework. Streamlit allows for the rapid development of interactive, reactive web applications purely in Python. It provides a highly responsive UI components system that flawlessly bridges the gap between complex backend data streams (like rendered PDF images and AI chat responses) and the end-user interface without the overhead of traditional JavaScript frameworks.
+
+### 4.8.2 Backend Technology
+- **FastAPI**: Chosen to handle the core backend API infrastructure. FastAPI is a modern, fast (high-performance) web framework for building APIs with Python based on standard Python type hints. It inherently supports asynchronous asynchronous request handling, which is crucial for preventing UI blocking during heavy PDF processing and external AI network requests. 
+- **Uvicorn**: Utilized as the lightning-fast ASGI (Asynchronous Server Gateway Interface) server to run the FastAPI backend, ensuring optimal concurrency for multiple user requests.
+
+### 4.8.3 AI and Machine Learning Integration
+- **OpenAI API & Groq**: The system integrates powerful Large Language Models (LLMs) such as GPT-3.5-turbo (and potentially Groq-powered models) to facilitate the "intelligent" features. These include semantic analysis, automatic summarization, accurate multi-language translation, and intelligent grammar error detection.
+- **Pytesseract (OCR)**: Employed for Optical Character Recognition capabilities, enabling the tool to parse and digitize text locked within scanned image-based PDFs.
+- **Transformers & PyTorch**: Included in the stack to support local implementation of advanced natural language and computer vision models when required.
+
+### 4.8.4 Document Processing and Manipulation
+A suite of specialized Python parsing libraries was integrated to handle varying aspects of PDF generation and dissection:
+- **PyMuPDF (fitz)**: Selected for its blazing-fast document rendering capabilities and precise positional text extraction.
+- **pdfplumber**: Utilized specifically for its detailed structural analysis, allowing the system to securely map out complex layouts and detect blank visual forms natively.
+- **PyPDF2 / pypdf**: Used for standard, robust file manipulations including merging, splitting, rotating, and watermarking document pages.
+- **pdf2docx & reportlab**: Employed for secure, high-fidelity conversion between PDF and editable Word documentation formats, as well as dynamic PDF generation post-editing.
 
 # Chapter 5 System Design
 ## 5.1 System Design and Methodology

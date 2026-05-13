@@ -4,5 +4,6 @@
   "git.autocommit.interval": 300,
   "git.autocommit.push": true,
   "github.copilot.chat.model": "Gemini 3 Flash (Preview)",
-  "git.ignoreLimitWarning": true
+  "git.ignoreLimitWarning": true,
+  "python.defaultInterpreterPath": "c:\\AI Smart PDF Editor\\myenv\\Scripts\\python.exe"
 }

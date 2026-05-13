@@ -168,7 +168,7 @@ def main():
     print("\n" + "=" * 60)
     print("Starting Backend Server...")
     print("=" * 60)
-    backend_command = f"uvicorn backend.main:app --workers 4 --host {backend_host} --port {backend_port}"
+    backend_command = f"uvicorn backend.main:app --host {backend_host} --port {backend_port} --reload"
     backend_process = run_command(backend_command, name="Backend")
     
     if not backend_process:

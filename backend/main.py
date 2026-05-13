@@ -11,6 +11,11 @@ app = FastAPI(
     version="1.0.0",
 )
 
+# ── Increase multipart form field size limit to 50 MB ────────────────────────
+# Default Starlette limit is 1 MB per field — too small for base64 signature images.
+from starlette.formparsers import MultiPartParser
+MultiPartParser.max_part_size = 50 * 1024 * 1024   # 50 MB per field
+
 # ================= CORS =================
 app.add_middleware(
     CORSMiddleware,

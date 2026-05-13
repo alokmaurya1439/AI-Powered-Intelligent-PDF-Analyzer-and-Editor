@@ -184,8 +184,8 @@ def ocr_pdf_blocks(file_path: str) -> List[Dict[str, Any]]:
             if is_text_page(page):
                 all_blocks.extend(extract_text_blocks(page, page_num))
             else:
-                # 1x scale reduces image resolution by 4x compared to 2x, speeding up Tesseract massively
-                pix = page.get_pixmap(matrix=fitz.Matrix(1, 1))
+                # 3x scale (~216 DPI) is required for Tesseract to accurately spell words without generating hallucinations
+                pix = page.get_pixmap(matrix=fitz.Matrix(3, 3))
                 img_bytes = pix.tobytes("png")
                 ocr_tasks.append((page_num, img_bytes))
 

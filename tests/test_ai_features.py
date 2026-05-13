@@ -5,7 +5,6 @@ from fastapi.testclient import TestClient
 from reportlab.pdfgen import canvas
 
 from backend.main import app
-from modules.blank_detector import find_blank_in_file
 from modules.error_detector import detect_errors
 from modules.error_solver import generate_corrected_pdf
 from modules.summarizer import summarize_text
@@ -41,16 +40,6 @@ def test_summarize_text():
     summary = summarize_text(text, "short")
     assert isinstance(summary, str)
     assert summary.strip()
-
-
-def test_find_blank_fields_no_pdf():
-    temp_dir = _workspace_temp_dir()
-    pdf_path = temp_dir / "simple.pdf"
-    _create_sample_pdf(pdf_path, "No blanks in this file.")
-
-    blanks = find_blank_in_file(str(pdf_path))
-    assert isinstance(blanks, dict)
-    assert "message" in blanks or "form_fields" in blanks
 
 
 def test_health_endpoint():

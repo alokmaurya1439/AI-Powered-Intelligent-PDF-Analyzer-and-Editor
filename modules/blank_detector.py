@@ -1,76 +1,82 @@
-from pypdf import PdfReader
-import logging
+"""
+Blank Detector — detects ___ (underscore) blank lines in PDFs.
+Each blank is tagged is_signature=True if its label contains signature keywords.
+Also returns the exact bounding rect of the ___ token on the page.
+"""
 import re
-from typing import Dict
-from modules.pdf_reader import extract_text_or_ocr
+import logging
+from typing import Dict, List, Optional
+
+import fitz
 
 logging.basicConfig(level=logging.INFO)
 
-def find_blank_in_file(file_path: str) -> Dict:
+_SIG_KEYWORDS = [
+    "signature", "sign", "signed", "autograph",
+    "hastakshar", "हस्ताक्षर", "सही", "સહી",
+]
+
+
+def _is_signature_label(label: str) -> bool:
+    low = label.lower()
+    return any(kw in low for kw in _SIG_KEYWORDS)
+
+
+def _find_blank_rect(page: fitz.Page, blank_tok: str) -> Optional[List[float]]:
     """
-    Detect blank form fields and placeholder lines in a PDF.
-
-    Args:
-        file_path (str): Path to the PDF file
-
-    Returns:
-        dict: structured blank field information
+    Find the exact bounding rect of the underscore token on the page.
+    Returns [x0, y0, x1, y1] or None.
     """
+    hits = page.search_for(blank_tok)
+    if hits:
+        r = hits[0]
+        return [r.x0, r.y0, r.x1, r.y1]
+    return None
 
-    result = {
-        "form_fields": [],          # list of empty form field names
-        "text_placeholders": []     # list of lines with blanks
-    }
 
-    # ================= FORM FIELD DETECTION =================
+def find_blanks(file_path: str) -> List[Dict]:
+    """
+    Scan every page of the PDF for lines containing 4+ underscores (____).
+
+    Returns a list of dicts:
+        {
+            "index":        int,
+            "label":        str,   # text before the blank
+            "blank":        str,   # the raw underscore token
+            "full_line":    str,   # complete line text
+            "page":         int,   # 0-based page number
+            "rect":         list,  # [x0, y0, x1, y1] of the ___ on the page (or None)
+            "is_signature": bool,
+        }
+    """
+    results = []
     try:
-        reader = PdfReader(file_path)
-
-        root = reader.trailer.get("/Root", {})
-        if "/AcroForm" in root:
-            form = root["/AcroForm"]
-            fields = form.get("/Fields", [])
-
-            for fld in fields:
-                try:
-                    field_obj = fld.get_object()
-
-                    name = field_obj.get("/T", "<unnamed>")
-                    value = field_obj.get("/V", "")
-
-                    if not value or str(value).strip() == "":
-                        result["form_fields"].append(name)
-
-                except Exception as e:
-                    logging.warning(f"Field parse error: {e}")
-
+        with fitz.open(file_path) as doc:
+            idx = 0
+            for page_num, page in enumerate(doc):
+                text = page.get_text("text") or ""
+                for raw_line in text.splitlines():
+                    line = raw_line.strip()
+                    if not line:
+                        continue
+                    m = re.search(r"_{4,}", line)
+                    if not m:
+                        continue
+                    blank_tok = m.group(0)
+                    pos       = m.start()
+                    label     = line[:pos].strip().rstrip(":").strip()
+                    blank_rect = _find_blank_rect(page, blank_tok)
+                    results.append({
+                        "index":        idx,
+                        "label":        label or f"Blank {idx + 1}",
+                        "blank":        blank_tok,
+                        "full_line":    line,
+                        "page":         page_num,
+                        "rect":         blank_rect,   # exact position of ___
+                        "is_signature": _is_signature_label(label),
+                    })
+                    idx += 1
     except Exception as e:
-        logging.warning(f"⚠ Form parsing failed: {e}")
+        logging.error(f"Blank detection failed: {e}")
 
-    # ================= TEXT PLACEHOLDER DETECTION =================
-    try:
-        text = extract_text_or_ocr(file_path)
-
-        for line in text.splitlines():
-            clean_line = line.strip()
-
-            if not clean_line:
-                continue
-
-            # 🔍 Detect placeholders
-            if (
-                re.search(r"_{4,}", clean_line) or        # _______
-                re.search(r"\[\s{2,}\]", clean_line) or   # [    ]
-                re.search(r"\(\s{2,}\)", clean_line) or   # (    )
-                re.search(r":\s{3,}", clean_line)         # Name:     ___
-            ):
-                result["text_placeholders"].append(clean_line)
-
-    except Exception as e:
-        logging.warning(f"⚠ Text analysis failed: {e}")
-
-    # ================= FINAL RESPONSE =================
-    if not result["form_fields"] and not result["text_placeholders"]:
-        return {"message": "No blank fields or placeholders detected"}
-
-    return result
+    return results
